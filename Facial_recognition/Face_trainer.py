@@ -151,14 +151,16 @@ class IceDataset(utils.Dataset):
             a.close()
             
             class_labels=[]
-            polygons=[]
+            # polygons=[]
             for line in annot:
                 if len(line)>=1:
                     p=line.split()
                 
                     if p[0]=="Human" and p[1]=="face":
                         class_labels.append("Human face")
-                        polygons.append(p[2:6])
+                        # polygons.append(p[2:6])
+                        polygons={'all_points_y':[p[3],p[5]],
+                                  'all_points_x':[p[2],p[4]]}
                     
             # print("annots done for file n - push along?")
 
