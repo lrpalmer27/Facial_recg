@@ -22,12 +22,11 @@ COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
-DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "ICE_SHIP\\logs")
+DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "\\logs")
 
 ############################################################
 #  Configurations
 ############################################################
-
 
 class IceConfig(Config):
     """Configuration for training on the toy  dataset.
@@ -43,7 +42,7 @@ class IceConfig(Config):
     # IMAGES_PER_GPU = 2
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 1 + 1 # Background + Ice + Ship
+    NUM_CLASSES = 1 + 1 # Background + Human Face
 
     # Number of training steps per epoch
     STEPS_PER_EPOCH = 100 #100
@@ -67,117 +66,106 @@ class IceDataset(utils.Dataset):
         subset: Subset to load: train or val
         """
         # Add classes. We have only one class to add.
-        self.add_class("Trial", 1, "BG")
-        self.add_class("Trial", 2,"Human face")
+        self.add_class("Trial", 1, "Human face")
 
         # Train or validation dataset?
         assert subset in ["train", "val"]
-        dataset_dir = os.path.join(dataset_dir, subset)
+        # dataset_dir = os.path.join(dataset_dir, subset)
         
-        self.load_annotations_kaggle()
+        self.load_annotations_kaggle(dataset_dir,subset)
+        # self.load_annotations_VGG(dataset_dir)
         
-    # def load_annotations_VGG(self)
-        #     # Load annotations
-        #     # VGG Image Annotator (up to version 1.6) saves each image in the form:
-        #     # { 'filename': '28503151_5b5b7ec140_b.jpg',
-        #     #   'regions': {
-        #     #       '0': {
-        #     #           'region_attributes': {},
-        #     #           'shape_attributes': {
-        #     #               'all_points_x': [...],
-        #     #               'all_points_y': [...],
-        #     #               'name': 'polygon'}},
-        #     #       ... more regions ...
-        #     #   },
-        #     #   'size': 100202
-        #     # }
-        #     # We mostly care about the x and y coordinates of each region
-        #     # Note: In VIA 2.0, regions was changed from a dict to a list.
-        #     annotations = json.load(open(os.path.join(dataset_dir, "via_region_data.json")))
-        #     annotations = list(annotations.values())  # don't need the dict keys
-
-        #     # The VIA tool saves images in the JSON even if they don't have any
-        #     # annotations. Skip unannotated images.
-        #     annotations = [a for a in annotations if a['regions']]
-
-        #     # Add images
-        #     for a in annotations:
-        #         # Get the x, y coordinaets of points of the polygons that make up
-        #         # the outline of each object instance. These are stores in the
-        #         # shape_attributes (see json format above)
-        #         # The if condition is needed to support VIA versions 1.x and 2.x.
-        #         if type(a['regions']) is dict:
-        #             polygons = [r['shape_attributes'] for r in a['regions'].values()]
-        #             class_labels = [r['region_attributes']['Object'] for r in a['regions'].values()]
-        #         else:
-        #             polygons = [r['shape_attributes'] for r in a['regions']]
-        #             class_labels = [r['region_attributes']['Object'] for r in a['regions']] 
-
-        #         # load_mask() needs the image size to convert polygons to masks.
-        #         # Unfortunately, VIA doesn't include it in JSON, so we must read
-        #         # the image. This is only managable since the dataset is tiny.
-        #         image_path = os.path.join(dataset_dir, a['filename'])
-        #         image = skimage.io.imread(image_path)
-        #         height, width = image.shape[:2]
-                
-        #         ## Not very pythonic way to do this, but it works.
-        #         ids= [item.get('name') for item in self.class_info]
-        #         class_ids=[]
-
-        #         for l in class_labels:
-        #             for id in range(len(ids)):
-        #                 if l==ids[id]:
-        #                     class_ids.append(id)
-
-        #         self.add_image(
-        #             "Trial",
-        #             image_id=a['filename'],  # use file name as a unique image id
-        #             path=image_path,
-        #             width=width, height=height,
-        #             polygons=polygons, class_ids=np.array(class_ids))
-            
-    def load_annotations_kaggle(self)
+    def load_annotations_VGG(self,dataset_dir,subset):
+        #this is grandfathered in and has not been used or tested yet.
             # Load annotations
-        # VGG Image Annotator (up to version 1.6) saves each image in the form:
-        # { 'filename': '28503151_5b5b7ec140_b.jpg',
-        #   'regions': {
-        #       '0': {
-        #           'region_attributes': {},
-        #           'shape_attributes': {
-        #               'all_points_x': [...],
-        #               'all_points_y': [...],
-        #               'name': 'polygon'}},
-        #       ... more regions ...
-        #   },
-        #   'size': 100202
-        # }
-        # We mostly care about the x and y coordinates of each region
-        # Note: In VIA 2.0, regions was changed from a dict to a list.
-        annotations = json.load(open(os.path.join(dataset_dir, "via_region_data.json")))
-        annotations = list(annotations.values())  # don't need the dict keys
+            # VGG Image Annotator (up to version 1.6) saves each image in the form:
+            # { 'filename': '28503151_5b5b7ec140_b.jpg',
+            #   'regions': {
+            #       '0': {
+            #           'region_attributes': {},
+            #           'shape_attributes': {
+            #               'all_points_x': [...],
+            #               'all_points_y': [...],
+            #               'name': 'polygon'}},
+            #       ... more regions ...
+            #   },
+            #   'size': 100202
+            # }
+            # We mostly care about the x and y coordinates of each region
+            # Note: In VIA 2.0, regions was changed from a dict to a list.
+            annotations = json.load(open(os.path.join(dataset_dir+f'\\{subset}', "via_region_data.json")))
+            annotations = list(annotations.values())  # don't need the dict keys
 
-        # The VIA tool saves images in the JSON even if they don't have any
-        # annotations. Skip unannotated images.
-        annotations = [a for a in annotations if a['regions']]
+            # The VIA tool saves images in the JSON even if they don't have any
+            # annotations. Skip unannotated images.
+            annotations = [a for a in annotations if a['regions']]
 
-        # Add images
-        for a in annotations:
-            # Get the x, y coordinaets of points of the polygons that make up
-            # the outline of each object instance. These are stores in the
-            # shape_attributes (see json format above)
-            # The if condition is needed to support VIA versions 1.x and 2.x.
-            if type(a['regions']) is dict:
-                polygons = [r['shape_attributes'] for r in a['regions'].values()]
-                class_labels = [r['region_attributes']['Object'] for r in a['regions'].values()]
-            else:
-                polygons = [r['shape_attributes'] for r in a['regions']]
-                class_labels = [r['region_attributes']['Object'] for r in a['regions']] 
+            # Add images
+            for a in annotations:
+                # Get the x, y coordinaets of points of the polygons that make up
+                # the outline of each object instance. These are stores in the
+                # shape_attributes (see json format above)
+                # The if condition is needed to support VIA versions 1.x and 2.x.
+                if type(a['regions']) is dict:
+                    polygons = [r['shape_attributes'] for r in a['regions'].values()]
+                    class_labels = [r['region_attributes']['Object'] for r in a['regions'].values()]
+                else:
+                    polygons = [r['shape_attributes'] for r in a['regions']]
+                    class_labels = [r['region_attributes']['Object'] for r in a['regions']] 
+
+                # load_mask() needs the image size to convert polygons to masks.
+                # Unfortunately, VIA doesn't include it in JSON, so we must read
+                # the image. This is only managable since the dataset is tiny.
+                image_path = os.path.join(dataset_dir, a['filename'])
+                image = skimage.io.imread(image_path)
+                height, width = image.shape[:2]
+                
+                ## Not very pythonic way to do this, but it works.
+                ids= [item.get('name') for item in self.class_info]
+                class_ids=[]
+
+                for l in class_labels:
+                    for id in range(len(ids)):
+                        if l==ids[id]:
+                            class_ids.append(id)
+
+                self.add_image(
+                    "Trial",
+                    image_id=a['filename'],  # use file name as a unique image id
+                    path=image_path,
+                    width=width, height=height,
+                    polygons=polygons, class_ids=np.array(class_ids))
+            
+    def load_annotations_kaggle(self,dataset_dir,subset):
+        # Load annotations
+        filenames=os.listdir(dataset_dir+f'\\images\\{subset}\\')
+
+        for filename in filenames: 
+            #get and open annotation file
+            filename_no_ext=os.path.splitext(filename)[0]
+            a=open(dataset_dir+'labels\\'+f'{filename_no_ext}.txt','r')
+            annot=[]
+            
+            for i in a:
+                annot.append(i) #might need to be this
+            a.close()
+            
+            class_labels=[]
+            polygons=[]
+            for line in annot:
+                if len(line)>=1:
+                    p=line.split()
+                
+                    if p[0]=="Human" and p[1]=="face":
+                        class_labels.append("Human face")
+                        polygons.append(p[2:6])
+                    
+            # print("annots done for file n - push along?")
 
             # load_mask() needs the image size to convert polygons to masks.
             # Unfortunately, VIA doesn't include it in JSON, so we must read
             # the image. This is only managable since the dataset is tiny.
-            image_path = os.path.join(dataset_dir, a['filename'])
-            image = skimage.io.imread(image_path)
+            image = skimage.io.imread(dataset_dir+f'\\images\\{subset}\\{filename}')
             height, width = image.shape[:2]
             
             ## Not very pythonic way to do this, but it works.
@@ -191,8 +179,8 @@ class IceDataset(utils.Dataset):
 
             self.add_image(
                 "Trial",
-                image_id=a['filename'],  # use file name as a unique image id
-                path=image_path,
+                image_id=filename_no_ext,  # use file name as a unique image id
+                path=dataset_dir+f'\\images\\{subset}\\{filename}',
                 width=width, height=height,
                 polygons=polygons, class_ids=np.array(class_ids))
     
@@ -227,14 +215,6 @@ class IceDataset(utils.Dataset):
         # info['class_labels'] #doesnt work
         return mask, info['class_ids']
 
-    def image_reference(self, image_id):
-        """Return the path of the image."""
-        info = self.image_info[image_id]
-        if info["source"] == "Ice":
-            return info["path"]
-        else:
-            super(self.__class__, self).image_reference(image_id)
-
 
 def train(model):
     """Train the model."""
@@ -254,6 +234,8 @@ def train(model):
     # COCO trained weights, we don't need to train too long. Also,
     # no need to train all layers, just the heads should do it.
     print("Training network heads")
+    
+    model.set_log_dir(ROOT_DIR+'\\.logs')
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
                 epochs=2,
@@ -274,12 +256,10 @@ if __name__ == '__main__':
     # #re-starting
     # weights_path = model.find_last() #uncomment if need to re-start after pausing training.
     # model.load_weights(weights_path, by_name=True) #uncomment if need to re-start after pausing training.
-    
-    
+
     ## this is for training the big model only
-    dataset_path=ROOT_DIR+"\\.PeopleData\\train\\"
-    model_path = ROOT_DIR+'\\Logans_people_faces.h5'
-    
+    dataset_path=ROOT_DIR+"\\.PeopleData\\kaggle_face_detection_dataset\\"
+    model_path = ROOT_DIR+'\\kaggle_face_detection.h5'
     
     train(model)  
     model.keras_model.save_weights(model_path)
