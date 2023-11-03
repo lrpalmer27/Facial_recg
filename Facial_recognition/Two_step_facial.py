@@ -150,7 +150,10 @@ if __name__=='__main__':
     filenames=Test_img_list=os.listdir(ROOT_DIR+_TestDir+'\\test\\')
     # filenames=['_O4A9692-Edit.jpg']
     for file in filenames:
-        print('Chosen random file to display with mask predictions: ', file)
-        r,img=detect(m,file) #remove filename output from this and make a for loop in this if statement to pick all pics in the dir
-        crop(r,img,file)
+        if file != "desktop.ini":
+            print('Segmenting and saving: ', file)
+            r,img=detect(m,file) #remove filename output from this and make a for loop in this if statement to pick all pics in the dir
+            crop(r,img,file)
+        else:
+            continue
 
