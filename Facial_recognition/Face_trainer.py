@@ -42,7 +42,7 @@ class IceConfig(Config):
     # IMAGES_PER_GPU = 2
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 1 # Background + Human Face
+    NUM_CLASSES = 1 + 7 # Background + names
 
     # Number of training steps per epoch
     STEPS_PER_EPOCH = 100 #100
@@ -66,17 +66,23 @@ class IceDataset(utils.Dataset):
         subset: Subset to load: train or val
         """
         # Add classes. We have only one class to add.
-        self.add_class("Trial", 1, "Human face")
+        self.add_class("Trial", 1, "Logan")
+        self.add_class("Trial", 2, "Nick")
+        self.add_class("Trial", 3, "Erica")
+        self.add_class("Trial", 4, "Andy")
+        self.add_class("Trial", 5, "Kyla")
+        self.add_class("Trial", 6, "Sydney")
+        self.add_class("Trial", 7, "Chris")
+ 
 
         # Train or validation dataset?
         assert subset in ["train", "val"]
         # dataset_dir = os.path.join(dataset_dir, subset)
         
-        self.load_annotations_kaggle(dataset_dir,subset)
-        # self.load_annotations_VGG(dataset_dir)
+        # self.load_annotations_kaggle(dataset_dir,subset)
+        self.load_annotations_VGG(dataset_dir,subset)
         
     def load_annotations_VGG(self,dataset_dir,subset):
-        #this is grandfathered in and has not been used or tested yet.
             # Load annotations
             # VGG Image Annotator (up to version 1.6) saves each image in the form:
             # { 'filename': '28503151_5b5b7ec140_b.jpg',
@@ -108,15 +114,15 @@ class IceDataset(utils.Dataset):
                 # The if condition is needed to support VIA versions 1.x and 2.x.
                 if type(a['regions']) is dict:
                     polygons = [r['shape_attributes'] for r in a['regions'].values()]
-                    class_labels = [r['region_attributes']['Object'] for r in a['regions'].values()]
+                    class_labels = [r['region_attributes']['LogansPeople'] for r in a['regions'].values()]
                 else:
                     polygons = [r['shape_attributes'] for r in a['regions']]
-                    class_labels = [r['region_attributes']['Object'] for r in a['regions']] 
+                    class_labels = [r['region_attributes']['LogansPeople'] for r in a['regions']] 
 
                 # load_mask() needs the image size to convert polygons to masks.
                 # Unfortunately, VIA doesn't include it in JSON, so we must read
                 # the image. This is only managable since the dataset is tiny.
-                image_path = os.path.join(dataset_dir, a['filename'])
+                image_path = os.path.join(dataset_dir+f'\\{subset}', a['filename'])
                 image = skimage.io.imread(image_path)
                 height, width = image.shape[:2]
                 
@@ -159,8 +165,8 @@ class IceDataset(utils.Dataset):
                     if p[0]=="Human" and p[1]=="face":
                         class_labels.append("Human face")
                         # polygons.append(p[2:6])
-                        polygons={'all_points_y':[p[3],p[5]],
-                                  'all_points_x':[p[2],p[4]]}
+                        polygons=[{'all_points_y':[p[3],p[5]],
+                                  'all_points_x':[p[2],p[4]]}] #needs to be a list of dictionaries, but th
                     
             # print("annots done for file n - push along?")
 
@@ -240,7 +246,7 @@ def train(model):
     model.set_log_dir(ROOT_DIR+'\\.logs')
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=2,
+                epochs=50,
                 layers='heads')
 
 
@@ -260,8 +266,8 @@ if __name__ == '__main__':
     # model.load_weights(weights_path, by_name=True) #uncomment if need to re-start after pausing training.
 
     ## this is for training the big model only
-    dataset_path=ROOT_DIR+"\\.PeopleData\\kaggle_face_detection_dataset\\"
-    model_path = ROOT_DIR+'\\kaggle_face_detection.h5'
+    dataset_path=ROOT_DIR+"\\.PeopleData\\bodies\\"
+    model_path = ROOT_DIR+'\\LogansPeopleFaces.h5'
     
     train(model)  
     model.keras_model.save_weights(model_path)

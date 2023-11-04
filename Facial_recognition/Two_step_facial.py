@@ -43,7 +43,7 @@ def init():
     return model
 
 def detect(model,filename):
-    image = cv2.imread(ROOT_DIR+_TestDir+'test\\'+filename)
+    image = cv2.imread(ROOT_DIR+_TestDir+'nick\\'+filename)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     
     # Perform a forward pass of the network to obtain the results
@@ -147,7 +147,7 @@ def crop(r,image,filename):
 
 if __name__=='__main__': 
     m=init()
-    filenames=Test_img_list=os.listdir(ROOT_DIR+_TestDir+'\\test\\')
+    filenames=Test_img_list=os.listdir(ROOT_DIR+_TestDir+'\\nick\\')
     # filenames=['_O4A9692-Edit.jpg']
     for file in filenames:
         if file != "desktop.ini":
