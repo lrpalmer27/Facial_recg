@@ -33,7 +33,7 @@ class IceConfig(Config):
     Derives from the base Config class and overrides some values.
     """
     # Give the configuration a recognizable name
-    NAME = "Trial"
+    NAME = "FacialRecognition"
 
     # We use a GPU with 12GB memory, which can fit two images.
     # Adjust down if you use a smaller GPU.
@@ -245,7 +245,7 @@ def train(model):
     
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=30,
+                epochs=50,
                 layers='heads')
 
 
