@@ -243,17 +243,16 @@ def train(model):
     # no need to train all layers, just the heads should do it.
     print("Training network heads")
     
-    model.set_log_dir(ROOT_DIR+'\\.logs')
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=50,
+                epochs=30,
                 layers='heads')
 
 
 if __name__ == '__main__':
     config = IceConfig()
     config.display()
-    model = modellib.MaskRCNN(mode="training", config=config,model_dir=ROOT_DIR+"\\ICE_SHIP")
+    model = modellib.MaskRCNN(mode="training", config=config,model_dir=DEFAULT_LOGS_DIR)
     
     # #if coco
     weights_path = ROOT_DIR+"\\mask_rcnn_coco.h5" 
@@ -266,7 +265,7 @@ if __name__ == '__main__':
     # model.load_weights(weights_path, by_name=True) #uncomment if need to re-start after pausing training.
 
     ## this is for training the big model only
-    dataset_path=ROOT_DIR+"\\.PeopleData\\bodies\\"
+    dataset_path=ROOT_DIR+"\\.PeopleData\\bodies"
     model_path = ROOT_DIR+'\\LogansPeopleFaces.h5'
     
     train(model)  
