@@ -12,11 +12,12 @@ import random
 _TestDir="\\.PeopleData\\test\\"
 ROOT_DIR=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # CLASS_NAMES = ['BG', 'Person','bicycle', 'cell phone','book']
-CLASS_NAMES = ['BG', 'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch', 'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush']
+# CLASS_NAMES = ['BG', 'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch', 'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush']
+CLASS_NAMES=['BG', 'Logan','Nick','Chris','Kyla','Sydney','Andy','Erica']
 
 class SimpleConfig(mrcnn.config.Config):
     # Give the configuration a recognizable name
-    NAME = "facialrec"
+    NAME = "FacialRecognition"
     
     # set the number of GPUs to use along with the number of images per GPU
     GPU_COUNT = 1
@@ -32,7 +33,7 @@ model = mrcnn.model.MaskRCNN(mode="inference",
                              model_dir=os.getcwd())
 
 # Load the weights into the model.
-model.load_weights(filepath=ROOT_DIR+"\\mask_rcnn_coco.h5", 
+model.load_weights(filepath=ROOT_DIR+"\\LogansPeopleFaces.h5", 
                    by_name=True)
 
 # load the input image, convert it from BGR to RGB channel
